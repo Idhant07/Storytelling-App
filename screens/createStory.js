@@ -68,117 +68,117 @@ export default class CreateStory extends React.Component {
             <View style={styles.appTitleContainer}>
               <Text style={styles.appTitleText}>New Story</Text>
             </View>
-            <View>
-              <ScrollView>
-                <Image
-                  source={previewImages[this.state.previewImage]}
-                  style={styles.previewImage}
+          </View>
+          <View>
+            <ScrollView>
+              <Image
+                source={previewImages[this.state.previewImage]}
+                style={styles.previewImage}
+              />
+              <View>
+                <DropDownPicker
+                  items={[
+                    { label: "image 1", value: "image1" },
+                    { label: "image 2", value: "image2" },
+                    { label: "image 3", value: "image3" },
+                    { label: "image 4", value: "image4" },
+                    { label: "image 5", value: "image5" },
+                  ]}
+                  defaultValue={this.state.previewImage}
+                  containerStyle={{
+                    height: 50,
+                    borderRadius: 20,
+                    marginBottom: 20,
+                  }}
+                  onOpen={() => {
+                    this.setState({
+                      dropDownHeight: 170,
+                    });
+                  }}
+                  onClose={() => {
+                    this.setState({
+                      dropDownHeight: 40,
+                    });
+                  }}
+                  style={{ backgroundColor: "transparent" }}
+                  itemStyle={{ justifyContent: "flex-start" }}
+                  labelStyle={{
+                    color: "white",
+                    fontFamily: "Bubblegum-Sans",
+                  }}
+                  dropDownStyle={{ backgroundColor: "black" }}
+                  arrowStyle={{
+                    color: "white",
+                    fontFamily: "Bubblegum-Sans",
+                  }}
+                  onChangeItem={(item) => {
+                    this.setState({
+                      previewImage: item.value,
+                    });
+                  }}
                 />
-                <View>
-                  <DropDownPicker
-                    items={[
-                      { label: "image 1", value: "image1" },
-                      { label: "image 2", value: "image2" },
-                      { label: "image 3", value: "image3" },
-                      { label: "image 4", value: "image4" },
-                      { label: "image 5", value: "image5" },
-                    ]}
-                    defaultValue={this.state.previewImage}
-                    containerStyle={{
-                      height: 50,
-                      borderRadius: 20,
-                      marginBottom: 20,
-                    }}
-                    onOpen={() => {
-                      this.setState({
-                        dropDownHeight: 170,
-                      });
-                    }}
-                    onClose={() => {
-                      this.setState({
-                        dropDownHeight: 40,
-                      });
-                    }}
-                    style={{ backgroundColor: "transparent" }}
-                    itemStyle={{ justifyContent: "flex-start" }}
-                    labelStyle={{
-                      color: "white",
-                      fontFamily: "Bubblegum-Sans",
-                    }}
-                    dropDownStyle={{ backgroundColor: "black" }}
-                    arrowStyle={{
-                      color: "white",
-                      fontFamily: "Bubblegum-Sans",
-                    }}
-                    onChangeItem={(item) => {
-                      this.setState({
-                        previewImage: item.value,
-                      });
-                    }}
-                  />
-                </View>
-                <View>
-                  <TextInput
-                    style={styles.inputFont}
-                    onChangeText={(item) => {
-                      this.setState({
-                        item,
-                      });
-                    }}
-                    placeholder={"Title"}
-                    placeholderTextColor="White"
-                  />
-                  <TextInput
-                    style={[
-                      styles.inputFont,
-                      styles.inputFontExtra,
-                      styles.inputTextBig,
-                    ]}
-                    onChangeText={(item) => {
-                      this.setState({
-                        item,
-                      });
-                    }}
-                    placeholder={"Description"}
-                    placeholderTextColor="White"
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                  <TextInput
-                    style={[
-                      styles.inputFont,
-                      styles.inputFontExtra,
-                      styles.inputTextBig,
-                    ]}
-                    onChangeText={(item) => {
-                      this.setState({
-                        item,
-                      });
-                    }}
-                    placeholder={"Story"}
-                    placeholderTextColor="White"
-                    multiline={true}
-                    numberOfLines={20}
-                  />
-                  <TextInput
-                    style={[
-                      styles.inputFont,
-                      styles.inputFontExtra,
-                      styles.inputTextBig,
-                    ]}
-                    onChangeText={(item) => {
-                      this.setState({
-                        item,
-                      });
-                    }}
-                    placeholder={"Moral of The Story"}
-                    placeholderTextColor="White"
-                    multiline={true}
-                    numberOfLines={4}
-                  />
-                </View>
-              </ScrollView>
-            </View>
+              </View>
+              <View>
+                <TextInput
+                  style={styles.inputFont}
+                  onChangeText={(item) => {
+                    this.setState({
+                      item,
+                    });
+                  }}
+                  placeholder={"Title"}
+                  placeholderTextColor="white"
+                />
+                <TextInput
+                  style={[
+                    styles.inputFont,
+                    styles.inputFontExtra,
+                    styles.inputTextBig,
+                  ]}
+                  onChangeText={(item) => {
+                    this.setState({
+                      item,
+                    });
+                  }}
+                  placeholder={"Description"}
+                  placeholderTextColor="White"
+                  multiline={true}
+                  numberOfLines={4}
+                />
+                <TextInput
+                  style={[
+                    styles.inputFont,
+                    styles.inputFontExtra,
+                    styles.inputTextBig,
+                  ]}
+                  onChangeText={(item) => {
+                    this.setState({
+                      item,
+                    });
+                  }}
+                  placeholder={"Story"}
+                  placeholderTextColor="White"
+                  multiline={true}
+                  numberOfLines={20}
+                />
+                <TextInput
+                  style={[
+                    styles.inputFont,
+                    styles.inputFontExtra,
+                    styles.inputTextBig,
+                  ]}
+                  onChangeText={(item) => {
+                    this.setState({
+                      item,
+                    });
+                  }}
+                  placeholder={"Moral of The Story"}
+                  placeholderTextColor="White"
+                  multiline={true}
+                  numberOfLines={4}
+                />
+              </View>
+            </ScrollView>
           </View>
         </View>
       );

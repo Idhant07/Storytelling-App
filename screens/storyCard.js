@@ -7,6 +7,7 @@ import {
   FlatList,
   Dimensions,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import AppLoading from "expo-app-loading";
@@ -38,58 +39,67 @@ export default class StoryCard extends React.Component {
     } else {
       return (
         <View style={styles.container}>
-          <SafeAreaView styles={styles.androidSafeArea} />
-          <View style={styles.cardContainer}>
-            <View style={styles.storyImage}>
-              <Image
-                source={require("../assets/story_image_1.png")}
-                style={{
-                  resizeMode: "contain",
-                  width: Dimensions.get("window").width - 55,
-                  height: 250,
-                  borderRadius: 10,
-                }}
-              />
-            </View>
-            <View style={styles.titleContainer}>
-              <View style={styles.titleTextContainer}>
-                <View style={styles.storyTitle}>
-                  <Text style={styles.storyTitleText}>
-                    {this.props.story.title}
-                  </Text>
+          <TouchableOpacity
+            onPress={() => {
+              this.props.navigation.navigate(
+                "StoryScreen",
+                (story = this.props.story)
+              );
+            }}
+          >
+            <SafeAreaView styles={styles.androidSafeArea} />
+            <View style={styles.cardContainer}>
+              <View style={styles.storyImage}>
+                <Image
+                  source={require("../assets/story_image_1.png")}
+                  style={{
+                    resizeMode: "contain",
+                    width: Dimensions.get("window").width - 55,
+                    height: 250,
+                    borderRadius: 10,
+                  }}
+                />
+              </View>
+              <View style={styles.titleContainer}>
+                <View style={styles.titleTextContainer}>
+                  <View style={styles.storyTitle}>
+                    <Text style={styles.storyTitleText}>
+                      {this.props.story.title}
+                    </Text>
+                  </View>
+                  <View style={styles.storyAuthor}>
+                    <Text style={styles.storyAuthorText}>
+                      {this.props.story.author}
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.storyAuthor}>
-                  <Text style={styles.storyAuthorText}>
-                    {this.props.story.author}
-                  </Text>
+              </View>
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.descriptionText}>
+                  {this.props.story.description}
+                </Text>
+              </View>
+              <View style={styles.actionContainer}>
+                <View style={styles.likeButton}>
+                  <View style={styles.likeIcon}>
+                    <Ionicons
+                      name={"heart"}
+                      style={{
+                        width: 30,
+                        height: 40,
+                        marginTop: 5,
+                        marginLeft: 20,
+                      }}
+                      size={30}
+                    />
+                  </View>
+                  <View>
+                    <Text style={styles.likeText}>10K</Text>
+                  </View>
                 </View>
               </View>
             </View>
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.descriptionText}>
-                {this.props.story.description}
-              </Text>
-            </View>
-            <View style={styles.actionContainer}>
-              <View style={styles.likeButton}>
-                <View style={styles.likeIcon}>
-                  <Ionicons
-                    name={"heart"}
-                    style={{
-                      width: 30,
-                      height: 40,
-                      marginTop: 5,
-                      marginLeft: 20,
-                    }}
-                    size={30}
-                  />
-                </View>
-                <View>
-                  <Text style={styles.likeText}>10K</Text>
-                </View>
-              </View>
-            </View>
-          </View>
+          </TouchableOpacity>
         </View>
       );
     }
