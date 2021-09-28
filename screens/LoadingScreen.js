@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import firebase from "firebase";
+import firebase from "firebase/app";
+require("@firebase/auth");
 
 export default class LoadingScreen extends Component {
   componentDidMount() {

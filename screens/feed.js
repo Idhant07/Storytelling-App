@@ -17,12 +17,15 @@ let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf"),
 };
 let stories = require("../temp_stories.json");
+import firebase from "firebase/app";
+require("@firebase/auth");
 
 export default class Feed extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       fontsLoaded: false,
+      stories: [],
     };
   }
   async loadFonts() {
@@ -33,10 +36,32 @@ export default class Feed extends React.Component {
   }
   componentDidMount() {
     this.loadFonts();
+    this.fetchStories();
   }
   keyExtractor = (item, index) => index.toString();
   renderItem = ({ item: story }) => {
     return <StoryCard story={story} navigation={this.props.navigation} />;
+  };
+
+  fetchStories = () => {
+    firebase
+      .database()
+      .ref("/posts/")
+      .on("value", (snapshot) => {
+        let stories = [];
+        if (snapshot.val()) {
+          Object.keys(snapshot.val()).forEach(function (key) {
+            stories.push({
+              key: key,
+              value: snapshot.val()[key],
+            });
+          });
+        }
+        this.setState({
+          stories: stories,
+        });
+        this.props.setUpdateToFalse();
+      });
   };
 
   render() {
@@ -62,13 +87,20 @@ export default class Feed extends React.Component {
               <Text styles={styles.appTitleText}>Storytelling App</Text>
             </View>
           </View>
-          <View>
-            <FlatList
-              data={stories}
-              keyExtractor={this.keyExtractor}
-              renderItem={this.renderItem}
-            />
-          </View>
+          {!this.state.stories[0] ? (
+            <View>
+              <Text>No stories are available</Text>
+            </View>
+          ) : (
+            <View>
+              <FlatList
+                data={stories}
+                keyExtractor={this.keyExtractor}
+                renderItem={this.renderItem}
+              />
+            </View>
+          )}
+
           <Text>Feed</Text>
         </View>
       );

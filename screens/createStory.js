@@ -1,185 +1,208 @@
-import * as React from "react";
+import React, { Component } from "react";
 import {
-  Text,
   View,
+  Text,
   StyleSheet,
   SafeAreaView,
-  FlatList,
-  Dimensions,
+  Platform,
+  StatusBar,
   Image,
   ScrollView,
   TextInput,
-  Platform,
-  StatusBar,
+  Dimensions,
+  Alert,
 } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
+import DropDownPicker from "react-native-dropdown-picker";
+
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import DropDownPicker from "react-native-dropdown-picker";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import firebase from "firebase/app";
+require("@firebase/auth");
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf"),
 };
 
-export default class CreateStory extends React.Component {
+export default class CreateStory extends Component {
   constructor(props) {
     super(props);
     this.state = {
       fontsLoaded: false,
-      previewImage: "image1",
-      dropDownHeight: 40,
+      previewImage: "image_1",
+      dropdownHeight: 40,
     };
   }
-  async loadFonts() {
+
+  async _loadFontsAsync() {
     await Font.loadAsync(customFonts);
-    this.setState({
-      fontsLoaded: true,
-    });
+    this.setState({ fontsLoaded: true });
   }
+
   componentDidMount() {
-    this.loadFonts();
+    this._loadFontsAsync();
   }
+
+  async addStory() {
+    if (
+      this.state.title &&
+      this.state.description &&
+      this.state.story &&
+      this.state.moral
+    ) {
+      let storyData = {
+        previewImage: this.state.previewImage,
+        title: this.state.title,
+        description: this.state.description,
+        story: this.state.story,
+        moral: this.state.moral,
+        author: firebase.auth().currentUser.displayName,
+        createdOn: new Date(),
+        authorUID: firebase.auth().currentUser.uid,
+        likes: 0,
+      };
+      await firebase
+        .database()
+        .ref("/posts/" + Math.random().toString(36).slice(2))
+        .set(storyData)
+        .then(function (snapshot) {});
+      this.props.setUpdateToTrue();
+      this.props.navigation.navigate("Feed");
+    } else {
+      Alert.alert("error", "all fields are rquired");
+    }
+  }
+
   render() {
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
     } else {
-      let previewImages = {
-        image1: require("../assets/story_image_1.png"),
-        image2: require("../assets/story_image_2.png"),
-        image3: require("../assets/story_image_3.png"),
-        image4: require("../assets/story_image_4.png"),
-        image5: require("../assets/story_image_5.png"),
+      let preview_images = {
+        image_1: require("../assets/story_image_1.png"),
+        image_2: require("../assets/story_image_2.png"),
+        image_3: require("../assets/story_image_3.png"),
+        image_4: require("../assets/story_image_4.png"),
+        image_5: require("../assets/story_image_5.png"),
       };
       return (
         <View style={styles.container}>
-          <SafeAreaView styles={styles.androidSafeArea} />
+          <SafeAreaView style={styles.droidSafeArea} />
           <View style={styles.appTitle}>
             <View style={styles.appIcon}>
               <Image
                 source={require("../assets/logo.png")}
-                style={{
-                  resizeMode: "contain",
-                  width: Dimensions.get("window").width - 55,
-                  height: 250,
-                  borderRadius: 10,
-                }}
-              />
+                style={styles.iconImage}
+              ></Image>
             </View>
-            <View style={styles.appTitleContainer}>
+            <View style={styles.appTitleTextContainer}>
               <Text style={styles.appTitleText}>New Story</Text>
             </View>
           </View>
-          <View>
+          <View style={styles.fieldsContainer}>
             <ScrollView>
               <Image
-                source={previewImages[this.state.previewImage]}
+                source={preview_images[this.state.previewImage]}
                 style={styles.previewImage}
-              />
-              <View>
+              ></Image>
+              <View style={{ height: RFValue(this.state.dropdownHeight) }}>
                 <DropDownPicker
                   items={[
-                    { label: "image 1", value: "image1" },
-                    { label: "image 2", value: "image2" },
-                    { label: "image 3", value: "image3" },
-                    { label: "image 4", value: "image4" },
-                    { label: "image 5", value: "image5" },
+                    { label: "Image 1", value: "image_1" },
+                    { label: "Image 2", value: "image_2" },
+                    { label: "Image 3", value: "image_3" },
+                    { label: "Image 4", value: "image_4" },
+                    { label: "Image 5", value: "image_5" },
                   ]}
                   defaultValue={this.state.previewImage}
                   containerStyle={{
-                    height: 50,
+                    height: 40,
                     borderRadius: 20,
-                    marginBottom: 20,
+                    marginBottom: 10,
                   }}
                   onOpen={() => {
-                    this.setState({
-                      dropDownHeight: 170,
-                    });
+                    this.setState({ dropdownHeight: 170 });
                   }}
                   onClose={() => {
-                    this.setState({
-                      dropDownHeight: 40,
-                    });
+                    this.setState({ dropdownHeight: 40 });
                   }}
                   style={{ backgroundColor: "transparent" }}
-                  itemStyle={{ justifyContent: "flex-start" }}
+                  itemStyle={{
+                    justifyContent: "flex-start",
+                  }}
+                  dropDownStyle={{ backgroundColor: "#2f345d" }}
                   labelStyle={{
                     color: "white",
                     fontFamily: "Bubblegum-Sans",
                   }}
-                  dropDownStyle={{ backgroundColor: "black" }}
                   arrowStyle={{
                     color: "white",
                     fontFamily: "Bubblegum-Sans",
                   }}
-                  onChangeItem={(item) => {
+                  onChangeItem={(item) =>
                     this.setState({
                       previewImage: item.value,
-                    });
-                  }}
+                    })
+                  }
                 />
               </View>
+
+              <TextInput
+                style={styles.inputFont}
+                onChangeText={(title) => this.setState({ title })}
+                placeholder={"Title"}
+                placeholderTextColor="white"
+              />
+
+              <TextInput
+                style={[
+                  styles.inputFont,
+                  styles.inputFontExtra,
+                  styles.inputTextBig,
+                ]}
+                onChangeText={(description) => this.setState({ description })}
+                placeholder={"Description"}
+                multiline={true}
+                numberOfLines={4}
+                placeholderTextColor="white"
+              />
+              <TextInput
+                style={[
+                  styles.inputFont,
+                  styles.inputFontExtra,
+                  styles.inputTextBig,
+                ]}
+                onChangeText={(story) => this.setState({ story })}
+                placeholder={"Story"}
+                multiline={true}
+                numberOfLines={20}
+                placeholderTextColor="white"
+              />
+
+              <TextInput
+                style={[
+                  styles.inputFont,
+                  styles.inputFontExtra,
+                  styles.inputTextBig,
+                ]}
+                onChangeText={(moral) => this.setState({ moral })}
+                placeholder={"Moral of the story"}
+                multiline={true}
+                numberOfLines={4}
+                placeholderTextColor="white"
+              />
               <View>
-                <TextInput
-                  style={styles.inputFont}
-                  onChangeText={(item) => {
-                    this.setState({
-                      item,
-                    });
+                <TouchableOpacity
+                  onPress={() => {
+                    this.addStory();
                   }}
-                  placeholder={"Title"}
-                  placeholderTextColor="white"
-                />
-                <TextInput
-                  style={[
-                    styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig,
-                  ]}
-                  onChangeText={(item) => {
-                    this.setState({
-                      item,
-                    });
-                  }}
-                  placeholder={"Description"}
-                  placeholderTextColor="White"
-                  multiline={true}
-                  numberOfLines={4}
-                />
-                <TextInput
-                  style={[
-                    styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig,
-                  ]}
-                  onChangeText={(item) => {
-                    this.setState({
-                      item,
-                    });
-                  }}
-                  placeholder={"Story"}
-                  placeholderTextColor="White"
-                  multiline={true}
-                  numberOfLines={20}
-                />
-                <TextInput
-                  style={[
-                    styles.inputFont,
-                    styles.inputFontExtra,
-                    styles.inputTextBig,
-                  ]}
-                  onChangeText={(item) => {
-                    this.setState({
-                      item,
-                    });
-                  }}
-                  placeholder={"Moral of The Story"}
-                  placeholderTextColor="White"
-                  multiline={true}
-                  numberOfLines={4}
-                />
+                  style={styles.submitButton}
+                >
+                  <Text style={styles.submitButtonText}>SUBMIT</Text>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
+          <View style={{ flex: 0.08 }} />
         </View>
       );
     }
@@ -187,21 +210,40 @@ export default class CreateStory extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#15193c" },
+  container: {
+    flex: 1,
+    backgroundColor: "#15193c",
+  },
   droidSafeArea: {
     marginTop:
       Platform.OS === "android" ? StatusBar.currentHeight : RFValue(35),
   },
-  appTitle: { flex: 0.07, flexDirection: "row" },
-  appIcon: { flex: 0.3, justifyContent: "center", alignItems: "center" },
-  iconImage: { width: "100%", height: "100%", resizeMode: "contain" },
-  appTitleTextContainer: { flex: 0.7, justifyContent: "center" },
+  appTitle: {
+    flex: 0.07,
+    flexDirection: "row",
+  },
+  appIcon: {
+    flex: 0.3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "contain",
+  },
+  appTitleTextContainer: {
+    flex: 0.7,
+    justifyContent: "center",
+  },
   appTitleText: {
     color: "white",
     fontSize: RFValue(28),
     fontFamily: "Bubblegum-Sans",
   },
-  fieldsContainer: { flex: 0.85 },
+  fieldsContainer: {
+    flex: 0.85,
+  },
   previewImage: {
     width: "93%",
     height: RFValue(250),
@@ -219,6 +261,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontFamily: "Bubblegum-Sans",
   },
-  inputFontExtra: { marginTop: RFValue(15) },
-  inputTextBig: { textAlignVertical: "top", padding: RFValue(5) },
+  inputFontExtra: {
+    marginTop: RFValue(15),
+  },
+  inputTextBig: {
+    textAlignVertical: "top",
+    padding: RFValue(5),
+  },
 });

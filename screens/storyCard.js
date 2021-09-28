@@ -13,6 +13,8 @@ import { RFValue } from "react-native-responsive-fontsize";
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import firebase from "firebase/app";
+require("@firebase/auth");
 let customFonts = {
   "Bubblegum-Sans": require("../assets/fonts/BubblegumSans-Regular.ttf"),
 };
@@ -22,8 +24,39 @@ export default class StoryCard extends React.Component {
     super(props);
     this.state = {
       fontsLoaded: false,
+      lightTheme: true,
+      storyID: this.props.story.key,
+      storyData: this.props.story.value,
+      isLiked: false,
+      likes: this.props.story.value.likes,
     };
   }
+  likeAction = () => {
+    if (this.state.isLiked) {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(-1));
+      this.setState({
+        likes: (this.state.likes -= 1),
+        isLiked: false,
+      });
+    } else {
+      firebase
+        .database()
+        .ref("posts")
+        .child(this.state.storyID)
+        .child("likes")
+        .set(firebase.database.ServerValue.increment(1));
+      this.setState({
+        likes: (this.state.likes += 1),
+        isLiked: false,
+      });
+    }
+  };
+
   async loadFonts() {
     await Font.loadAsync(customFonts);
     this.setState({
@@ -32,11 +65,34 @@ export default class StoryCard extends React.Component {
   }
   componentDidMount() {
     this.loadFonts();
+    this.fetchUser();
   }
+
+  fetchUser = () => {
+    let theme;
+    firebase
+      .database()
+      .ref("/users/" + firebase.auth().currentUser.uid)
+      .on("value", function (snapshot) {
+        theme = snapshot.val().current_theme;
+      });
+    this.setState({
+      lightTheme: theme === "light" ? true : false,
+    });
+  };
+
   render() {
+    let story = this.state.storyData;
     if (!this.state.fontsLoaded) {
       return <AppLoading />;
     } else {
+      let images = {
+        image_1: require("../assets/story_image_1.png"),
+        image_2: require("../assets/story_image_2.png"),
+        image_3: require("../assets/story_image_3.png"),
+        image_4: require("../assets/story_image_4.png"),
+        image_5: require("../assets/story_image_5.png"),
+      };
       return (
         <View style={styles.container}>
           <TouchableOpacity
@@ -48,10 +104,16 @@ export default class StoryCard extends React.Component {
             }}
           >
             <SafeAreaView styles={styles.androidSafeArea} />
-            <View style={styles.cardContainer}>
+            <View
+              style={
+                this.state.lightTheme
+                  ? styles.cardContainerLight
+                  : styles.cardContainer
+              }
+            >
               <View style={styles.storyImage}>
                 <Image
-                  source={require("../assets/story_image_1.png")}
+                  source={images[story.preview_image]}
                   style={{
                     resizeMode: "contain",
                     width: Dimensions.get("window").width - 55,
@@ -60,10 +122,28 @@ export default class StoryCard extends React.Component {
                   }}
                 />
               </View>
-              <View style={styles.titleContainer}>
-                <View style={styles.titleTextContainer}>
+              <View
+                style={
+                  this.state.lightTheme
+                    ? styles.titleContainerLight
+                    : styles.titleContainer
+                }
+              >
+                <View
+                  style={
+                    this.state.lightTheme
+                      ? styles.titleTextContainerLight
+                      : styles.titleTextContainer
+                  }
+                >
                   <View style={styles.storyTitle}>
-                    <Text style={styles.storyTitleText}>
+                    <Text
+                      style={
+                        this.state.lightTheme
+                          ? styles.storyTitleTextLight
+                          : styles.storyTitleText
+                      }
+                    >
                       {this.props.story.title}
                     </Text>
                   </View>
@@ -80,23 +160,29 @@ export default class StoryCard extends React.Component {
                 </Text>
               </View>
               <View style={styles.actionContainer}>
-                <View style={styles.likeButton}>
-                  <View style={styles.likeIcon}>
-                    <Ionicons
-                      name={"heart"}
-                      style={{
-                        width: 30,
-                        height: 40,
-                        marginTop: 5,
-                        marginLeft: 20,
-                      }}
-                      size={30}
-                    />
+                <TouchableOpacity
+                  onPress={() => {
+                    this.likeAction();
+                  }}
+                >
+                  <View style={styles.likeButton}>
+                    <View style={styles.likeIcon}>
+                      <Ionicons
+                        name={"heart"}
+                        style={{
+                          width: 30,
+                          height: 40,
+                          marginTop: 5,
+                          marginLeft: 20,
+                        }}
+                        size={30}
+                      />
+                    </View>
+                    <View>
+                      <Text style={styles.likeText}>10K</Text>
+                    </View>
                   </View>
-                  <View>
-                    <Text style={styles.likeText}>10K</Text>
-                  </View>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           </TouchableOpacity>
